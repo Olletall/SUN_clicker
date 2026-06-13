@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Sol Clicker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(#87ceeb, #fff3b0);
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 { color: orange; }
+
+    #sun {
+      font-size: 120px;
+      display: inline-block;
+      cursor: pointer;
+      user-select: none;
+      margin: 20px;
+      transition: all 0.1s ease;
+      filter: drop-shadow(0 8px 0 #d97706);
+    }
+
+    #sun:hover { transform: translateY(-2px); }
+
+    #sun:active {
+      transform: translateY(6px) scale(0.95);
+      filter: drop-shadow(0 2px 0 #d97706);
+    }
+
+    .upgrade {
+      margin: 12px auto;
+      padding: 10px;
+      width: 360px;
+      background: #ffcc66;
+      border: 2px solid orange;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      transition: all 0.1s ease;
+      box-shadow: 0 6px 0 #d97706;
+    }
+
+    .upgrade:hover { transform: translateY(-2px); }
+
+    .upgrade:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #d97706;
+    }
+
+    .icon {
+      font-size: 42px;
+      width: 60px;
+      text-align: center;
+    }
+
+    .info p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+
+    .info span { font-size: 13px; }
+
+    .silver { filter: grayscale(1) brightness(1.5) drop-shadow(0 8px 0 #888); }
+    .gold { filter: sepia(1) saturate(5) brightness(1.2) drop-shadow(0 8px 0 #d97706); }
+    .purple { filter: hue-rotate(250deg) saturate(3) drop-shadow(0 8px 0 purple); }
+  </style>
+</head>
+
+<body>
+  <h1>☀️ Sol Clicker ☀️</h1>
+
+  <h2>Klicks: <span id="clicks">0</span></h2>
+  <h3>Klick per sekund: <span id="cps">0</span></h3>
+
+  <div id="sun" onclick="clickSun()">☀️</div>
+
+  <h2>Uppgraderingar</h2>
+  <div id="upgrades"></div>
+
+  <script>
+    let clicks = 0;
+    let clicksPerSecond = 0;
+
+    let upgrades = [
+      {
+        name: "Eld klickare",
+        icon: "🔥",
+        description: "En liten eld som klickar åt dig.",
+        cost: 15,
+        increaseCost: 25,
+        cps: 1
+      },
+      {
+        name: "Flammpistol",
+        icon: "🔫",
+        description: "Skjuter eld och ger fler klick.",
+        cost: 100,
+        increaseCost: 50,
+        cps: 5
+      },
+      {
+        name: "Solpanel",
+        icon: "☀️",
+        description: "Samlar energi från solen.",
+        cost: 250,
+        increaseCost: 100,
+        cps: 15
+      },
+      {
+        name: "Lavakanon",
+        icon: "🌋",
+        description: "Sprutar lava varje sekund.",
+        cost: 500,
+        increaseCost: 200,
+        cps: 40
+      },
+      {
+        name: "Supernova Maskin",
+        icon: "💥",
+        description: "Skapar superhet energi.",
+        cost: 1000,
+        increaseCost: 500,
+        cps: 100
+      },
+      {
+        name: "Galax Generator",
+        icon: "🌌",
+        description: "Gör kraft från hela galaxen.",
+        cost: 2500,
+        increaseCost: 1000,
+        cps: 300
+      }
+    ];
+
+    function clickSun() {
+      clicks++;
+      updateScreen();
+    }
+
+    function buyUpgrade(index) {
+      let upgrade = upgrades[index];
+
+      if (clicks >= upgrade.cost) {
+        clicks -= upgrade.cost;
+        clicksPerSecond += upgrade.cps;
+        upgrade.cost += upgrade.increaseCost;
+        updateScreen();
+      } else {
+        alert("Du har inte tillräckligt med klicks!");
+      }
+    }
+
+    function createUpgrades() {
+      let upgradesDiv = document.getElementById("upgrades");
+      upgradesDiv.innerHTML = "";
+
+      upgrades.forEach((upgrade, index) => {
+        upgradesDiv.innerHTML += `
+          <div class="upgrade" onclick="buyUpgrade(${index})">
+            <div class="icon">${upgrade.icon}</div>
+            <div class="info">
+              <b>${upgrade.name}</b>
+              <p>${upgrade.description}</p>
+              <span>Kostar: <b id="cost${index}">${upgrade.cost}</b> klicks</span><br>
+              <span>Ger: +${upgrade.cps} klick per sekund</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function updateScreen() {
+      document.getElementById("clicks").textContent = Math.floor(clicks);
+      document.getElementById("cps").textContent = clicksPerSecond;
+
+      for (let i = 0; i < upgrades.length; i++) {
+        document.getElementById("cost" + i).textContent = upgrades[i].cost;
+      }
+
+      const sun = document.getElementById("sun");
+      sun.classList.remove("silver", "gold", "purple");
+
+      if (clicks >= 1000) {
+        sun.classList.add("purple");
+      } else if (clicks >= 500) {
+        sun.classList.add("gold");
+      } else if (clicks >= 300) {
+        sun.classList.add("silver");
+      }
+    }
+
+    createUpgrades();
+    updateScreen();
+
+    setInterval(() => {
+      clicks += clicksPerSecond;
+      updateScreen();
+    }, 1000);
+  </script>
+</body>
+</html>
